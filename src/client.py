@@ -69,10 +69,10 @@ def get_message(url, topic, endpoint='message'):
 
     res = response.json()
     if res['success']:
-        print('Topics Successfully Retrieved!')
+        print('Message Successfully Retrieved!')
         print(res['message'])
     else:
-        print('Failed To Retrieve Topics')
+        print('Failed To Retrieve Message')
 
 
 
@@ -84,9 +84,11 @@ if __name__ == '__main__':
 
         create_topic(url, topic="math")
         get_topics(url)
-        # add_message(url, topic="math", message='hello')
-        # add_message(url, topic="math", message='world')
-        # get_message(url, topic="math")
+        add_message(url, topic="math", message='hello')
+        add_message(url, topic="math", message='world')
+        get_message(url, topic="math")
+        get_message(url, topic="math")
+        get_message(url, topic="math")
         
         
     except KeyboardInterrupt:
