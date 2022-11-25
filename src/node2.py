@@ -40,6 +40,14 @@ class VoteRequest:
     last_log_term: int
 
     
+def serialize(rpc):
+    return {"class": rpc.__class__.__qualname__, "dict": dataclasses.asdict(rpc)}
+
+
+def deserialize(rpc_dict):
+    return globals()[rpc_dict["class"]](**rpc_dict["dict"])
+
+    
 class Node(object):
     def __init__(self, metadata: dict):
         self.role = Role.Follower
@@ -170,6 +178,6 @@ class Node(object):
         Invoked by candidates to gather votes
         '''
 
-    
+
 
 
