@@ -58,5 +58,12 @@ class Candidate(NodeState):
                 #     self.votes.append(result[2])
                 if result['vote_granted']:
                     self.votes.append(result['id'])
+    
+    def win(self):
+        return len(self.votes) > len(self.cluster) / 2
+    
+    def __repr__(self):
+        return f'{type(self).__name__, self.node.id, self.current_term}'
+
                 
 
