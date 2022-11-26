@@ -44,7 +44,7 @@ class Candidate(NodeState):
         self.current_term += 1
         self.votes.append(self.node) # vote itself
         logging.info(f'{self} sending vote requests to peers...')
-        client = Client()
+        client = Client() # init an http client
         with client as session:
             posts = [
                 grequests.post(f'http://{peer.uri}/raft/vote', json=VoteRequest(self).to_json(), session=session)
