@@ -1,7 +1,7 @@
 from NodeState import NodeState
 import grequests
 import json
-from client import Client
+from .client import Client
 import logging
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)

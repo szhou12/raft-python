@@ -8,7 +8,7 @@ from monitor import send_state_update
 from Candidate import Candidate
 from Follower import Follower
 from Leader import Leader
-from cluster import Cluster, ELECTION_TIMEOUT_MAX
+from .cluster import Cluster, ELECTION_TIMEOUT_MAX
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
