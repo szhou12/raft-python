@@ -5,7 +5,7 @@ import logging
 
 from monitor import send_state_update
 
-from Candidate import Candidate
+from Candidate import Candidate, VoteRequest
 from Follower import Follower
 from Leader import Leader
 from .cluster import Cluster, ELECTION_TIMEOUT_MAX
@@ -56,6 +56,26 @@ class TimerThread(threading.Thread):
         send_state_update(self.node_state, self.election_timeout) # TODO: implement this
         self.node_state = Leader(self.node_state)
         self.node_state.heartbeat()
+    
+    def vote(self, vote_request: VoteRequest):
+        '''
+        As Follower, vote for Candidate
+        Invoke NodeState.vote()
+        '''
+        logging.info(f'{self} received vote request: {vote_request}')
+        vote_result = self.node_state.vote(vote_request)
+        logging.info(f'{self} returns vote result: {vote_result}')
+        # TODO: Check if works
+        # if vote_result[0]:
+        #     self.become_follower()
+        if vote_result['vote_granted']:
+            self.become_follower()
+        return vote_result
+    
+    def __repr__(self):
+        return f'{type(self).__name__, self.node_state}'
+
+
 
 
 
