@@ -47,6 +47,7 @@ def heartbeat():
 def hello_raft():
     return f'raft cluster: {cluster}!'
 
+### python3 src/node.py config.json 0
 if __name__ == 'main':
     try:
         create_app()

@@ -26,7 +26,7 @@ class Leader(NodeState):
         while not self.stopped:
             logging.info(f'{self} send heartbeat to followers...')
             logging.info('====================================================>')
-            send_heartbeat(self, HEARTBEAT_INTERVAL) # TODO: implement this
+            # send_heartbeat(self, HEARTBEAT_INTERVAL) # TODO: implement this
             client = Client()
             with client as session:
                 posts = [

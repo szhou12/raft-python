@@ -43,7 +43,7 @@ class TimerThread(threading.Thread):
     def become_candidate(self):
         logging.warning(f'heartbeat is timeout: {int(self.election_timeout)}s')
         logging.info(f'{self} becomes Candidate and starts requesting votes...')
-        send_state_update(self.node_state, self.election_timeout) # TODO: implement this
+        # send_state_update(self.node_state, self.election_timeout) # TODO: implement this
         self.node_state = Candidate(self.node_state)
         self.node_state.elect()
         if self.node_state.win():
@@ -53,7 +53,7 @@ class TimerThread(threading.Thread):
     
     def become_leader(self):
         logging.info(f'{self} beomes Leader and starts sending heartbeat...')
-        send_state_update(self.node_state, self.election_timeout) # TODO: implement this
+        # send_state_update(self.node_state, self.election_timeout) # TODO: implement this
         self.node_state = Leader(self.node_state)
         self.node_state.heartbeat()
     
