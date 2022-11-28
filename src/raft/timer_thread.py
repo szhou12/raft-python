@@ -3,12 +3,13 @@ import threading
 from random import randrange
 import logging
 
-from monitor import send_state_update
+# from monitor import send_state_update
 
-from Candidate import Candidate, VoteRequest
-from Follower import Follower
-from Leader import Leader
 from .cluster import Cluster, ELECTION_TIMEOUT_MAX
+from .Candidate import Candidate, VoteRequest
+from .Follower import Follower
+from .Leader import Leader
+
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 

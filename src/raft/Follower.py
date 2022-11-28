@@ -1,4 +1,4 @@
-from NodeState import NodeState
+from .NodeState import NodeState
 import logging
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)

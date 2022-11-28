@@ -2,12 +2,12 @@ import time
 from random import randrange
 
 import grequests
-from NodeState import NodeState
+from .NodeState import NodeState
 from .client import Client
 from .cluster import HEARTBEAT_INTERVAL, ELECTION_TIMEOUT_MAX
 import logging
 
-from .monitor import send_state_update, send_heartbeat
+# from .monitor import send_state_update, send_heartbeat
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 

@@ -1,4 +1,4 @@
-from NodeState import NodeState
+from .NodeState import NodeState
 import grequests
 import json
 from .client import Client
