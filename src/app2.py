@@ -78,5 +78,6 @@ if __name__ == 'main':
         # app = create_app()
         timer_thread.start()
         app.run(host=cur_addr['ip'], port=cur_addr['port'], debug=True)
+        # app.run(host=cur_addr['ip'], port=cur_addr['port'])
     except KeyboardInterrupt:
         pass
