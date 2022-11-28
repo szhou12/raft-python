@@ -8,8 +8,8 @@ logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H
 VoteResult = collections.namedtuple('VoteResult', ['vote_granted', 'term', 'id'])
 
 class NodeState:
-    def __init__(self, node=None):
-        self.cluster = Cluster()
+    def __init__(self, node=None, cluster=None):
+        self.cluster = cluster
         self.node = node
         self.id = node.id
         self.current_term = 0
@@ -17,6 +17,7 @@ class NodeState:
     
     def vote(self, vote_request):
         '''
+        Me as Follower node reacting to Candidate node's vote request
         Args:
             vote request from candidate
         Return:

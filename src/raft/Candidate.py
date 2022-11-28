@@ -24,7 +24,7 @@ class VoteRequest:
 
 class Candidate(NodeState):
     def __init__(self, follower):
-        super(Candidate, self).__init__(follower.node)
+        super(Candidate, self).__init__(follower.node, follower.cluster)
         self.current_term = follower.current_term
         self.commit_index = follower.commit_index
         self.last_applied_index = follower.last_applied_index

@@ -12,18 +12,20 @@ from .cluster import Cluster, ELECTION_TIMEOUT_MAX
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
-cluster = Cluster()
+# cluster = Cluster()
 
 class TimerThread(threading.Thread):
-    def __init__(self, node_id):
+    def __init__(self, node_id, cluster):
         threading.Thread.__init__(self)
+        self.cluster = cluster
         self.node = cluster[node_id]
-        self.node_state = Follower(self.node)
+        self.node_state = Follower(self.node, self.cluster)
         self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
         self.election_timer = threading.Timer(self.election_timeout, self.become_candidate)
     
     def run(self):
         '''
+        Override Thread.run()
         When a thread/node init, it firstly becomes a Follower
         '''
         self.become_follower()
@@ -33,8 +35,8 @@ class TimerThread(threading.Thread):
         # randomizes timeout in case of >2 nodes timeout at the same time
         timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
         if type(self.node_state) != Follower:
-            logging.info(f'{self} now becomes Follower ...')
-            self.node_state = Follower(self.node)
+            logging.info(f'{self} now becomes Follower...')
+            self.node_state = Follower(self.node, self.cluster)
         logging.info(f'{self} reset election timer {timeout}s ...')
         self.election_timer.cancel() # reset every time it receives heartbeat
         self.election_timer = threading.Timer(timeout, self.become_candidate)

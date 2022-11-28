@@ -13,7 +13,7 @@ logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H
 
 class Leader(NodeState):
     def __init__(self, candidate):
-        super(Leader, self).__init__(candidate.node)
+        super(Leader, self).__init__(candidate.node, candidate.cluster)
         self.current_term = candidate.current_term
         self.commit_index = candidate.commit_index
         self.last_applied_index = candidate.last_applied_index
