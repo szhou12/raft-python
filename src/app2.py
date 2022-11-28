@@ -1,3 +1,7 @@
+# Ref: https://github.com/miguelgrinberg/Flask-SocketIO/issues/65
+from gevent import monkey
+monkey.patch_all()
+
 import sys
 import os
 from flask import Flask, request, jsonify
@@ -65,19 +69,19 @@ def load_conf(filename, node_id, key="addresses"):
 
 ### python3 src/node.py config.json 0
 ## app2.py -> node.py
-if __name__ == 'main':
+if __name__ == '__main__':
     try:
         json_filename = sys.argv[1].strip()
         node_id = int(sys.argv[2].strip())
-        addrs, cur_addr = load_conf(json_filename)
-
+        addrs, cur_addr = load_conf(json_filename, node_id)
         # NODE_ID = int(os.environ.get('NODE_ID'))
         cluster = Cluster(addrs)
         node = cluster[node_id]
         timer_thread = TimerThread(node_id, cluster)
         # app = create_app()
         timer_thread.start()
-        app.run(host=cur_addr['ip'], port=cur_addr['port'], debug=True)
-        # app.run(host=cur_addr['ip'], port=cur_addr['port'])
+        
+        # app.run(host=cur_addr['ip'].split("//")[1], port=cur_addr['port'], debug=True)
+        app.run(host=cur_addr['ip'].split("//")[1], port=cur_addr['port'])
     except KeyboardInterrupt:
         pass

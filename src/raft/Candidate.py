@@ -47,17 +47,17 @@ class Candidate(NodeState):
         client = Client() # init an http client
         with client as session:
             posts = [
-                grequests.post(f'http://{peer.uri}/raft/vote', json=VoteRequest(self).to_json(), session=session)
+                grequests.post(f'{peer.uri}/raft/vote', json=VoteRequest(self).to_json(), session=session)
                 for peer in self.followers
             ]
             for response in grequests.imap(posts):
                 result = response.json()
                 logging.info(f'{self} received vote result: {response.status_code}: {result}')
                 ## NOTE: need to check if works
-                # if result[0]:
-                #     self.votes.append(result[2])
-                if result['vote_granted']:
-                    self.votes.append(result['id'])
+                if result[0]:
+                    self.votes.append(result[2])
+                # if result['vote_granted']:
+                #     self.votes.append(result['id'])
     
     def win(self):
         return len(self.votes) > len(self.cluster) / 2

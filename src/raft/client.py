@@ -3,13 +3,12 @@ from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
 class Client:
-    def __init__(self, retry=10000): # NOTE: default retry=0???
+    def __init__(self, retry=0):
         self.session = None
         self.retry = retry
     
     def __enter__(self):
         self.session = requests.Session()
-        # Retry makes sure all client nodes are running
         retries = Retry(
             total=self.retry,
             backoff_factor=0.1,

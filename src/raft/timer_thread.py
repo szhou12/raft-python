@@ -5,7 +5,7 @@ import logging
 
 # from monitor import send_state_update
 
-from .cluster import Cluster, ELECTION_TIMEOUT_MAX
+from .cluster import ELECTION_TIMEOUT_MAX
 from .Candidate import Candidate, VoteRequest
 from .Follower import Follower
 from .Leader import Leader
@@ -13,7 +13,6 @@ from .Leader import Leader
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
-# cluster = Cluster()
 
 class TimerThread(threading.Thread):
     def __init__(self, node_id, cluster):
@@ -44,7 +43,7 @@ class TimerThread(threading.Thread):
         self.election_timer.start()
     
     def become_candidate(self):
-        logging.warning(f'heartbeat is timeout: {int(self.election_timeout)}s')
+        logging.warning(f'Heartbeat is timeout: {int(self.election_timeout)}s')
         logging.info(f'{self} becomes Candidate and starts requesting votes...')
         # send_state_update(self.node_state, self.election_timeout) # TODO: implement this
         self.node_state = Candidate(self.node_state)
@@ -68,10 +67,7 @@ class TimerThread(threading.Thread):
         logging.info(f'{self} received vote request: {vote_request}')
         vote_result = self.node_state.vote(vote_request)
         logging.info(f'{self} returns vote result: {vote_result}')
-        # TODO: Check if works
-        # if vote_result[0]:
-        #     self.become_follower()
-        if vote_result['vote_granted']:
+        if vote_result[0]:
             self.become_follower()
         return vote_result
     

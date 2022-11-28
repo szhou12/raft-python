@@ -24,16 +24,16 @@ class Leader(NodeState):
 
     def heartbeat(self):
         while not self.stopped:
-            logging.info(f'{self} send heartbeat to followers...')
+            logging.info(f'{self} sending heartbeat to followers...')
             logging.info('====================================================>')
             # send_heartbeat(self, HEARTBEAT_INTERVAL) # TODO: implement this
             client = Client()
             with client as session:
                 posts = [
-                    grequests.post(f'http//{peer.uri}/raft/heartbeat', json=self.node, session=session)
+                    grequests.post(f'{peer.uri}/raft/heartbeat', json=self.node, session=session)
                     for peer in self.followers
                 ]
-                for response in grequests.map(posts, gtimeout=HEARTBEAT_INTERVAL):
+                for response in grequests.map(posts, gtimeout=HEARTBEAT_INTERVAL): # stop waiting for response after heartbeat time
                     if response is not None:
                         logging.info(f'{self} received heartbeat response from follower: {response.json()}')
                     else:
