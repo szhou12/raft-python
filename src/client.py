@@ -64,8 +64,8 @@ def get_message(url, topic, endpoint='message'):
     response = requests.get(f'{url}/{endpoint}/{topic}')
 
     # Testing
-    print('raw response',response)
-    print('json response',response.json())
+    print('raw response', response)
+    print('json response', response.json())
 
     res = response.json()
     if res['success']:
@@ -75,6 +75,12 @@ def get_message(url, topic, endpoint='message'):
         print('Failed To Retrieve Message')
 
 
+def get_status(url, endpoint='status'):
+    response = requests.get(f'{url}/{endpoint}')
+    # Testing
+    print('raw response', response)
+    print('json response', response.json())
+
 
 IP = '127.0.0.1'
 if __name__ == '__main__':
@@ -82,13 +88,14 @@ if __name__ == '__main__':
         port = int(sys.argv[1].strip())
         url = f'http://{IP}:{port}'
 
-        create_topic(url, topic="math")
-        get_topics(url)
-        add_message(url, topic="math", message='hello')
-        add_message(url, topic="math", message='world')
-        get_message(url, topic="math")
-        get_message(url, topic="math")
-        get_message(url, topic="math")
+        # create_topic(url, topic="math")
+        # get_topics(url)
+        # add_message(url, topic="math", message='hello')
+        # add_message(url, topic="math", message='world')
+        # get_message(url, topic="math")
+        # get_message(url, topic="math")
+        # get_message(url, topic="math")
+        get_status(url)
         
         
     except KeyboardInterrupt:

@@ -13,7 +13,7 @@ class NodeState:
         self.node = node
         self.id = node.id
         self.current_term = 0
-        self.vote_for = None # node ID of the voted Candidate
+        self.vote_for = None # Candidate ID that me as Follower voted
     
     def vote(self, vote_request):
         '''
@@ -30,18 +30,22 @@ class NodeState:
         '''
         candidate_term = vote_request['term']
         candidate_id = vote_request['candidate_id']
+
         if candidate_term > self.current_term:
-            logging.info(f'{self} accepts vote request as term: {candidate_term} > {self.current_term}')
+            logging.info(f'{self} accepts vote request as Candidate term: {candidate_term} > {self.current_term} (Follower term)')
             self.vote_for = candidate_id
             self.current_term = candidate_term
             return VoteResult(True, self.current_term, self.id)
+
         if candidate_term < self.current_term:
             logging.info(f'{self} rejects vote request as term: {candidate_term} < {self.current_term}')
             return VoteResult(False, self.current_term, self.id)
+
         if self.vote_for is None or self.vote_for == candidate_id:
             # TODO: check if the candidate's log is newer than receiver's
             self.vote_for = candidate_id
             return VoteResult(True, self.current_term, self.id)
+            
         logging.info(f'{self} rejects vote request as vote_for id: {self.vote_for} != {candidate_id}')
         return VoteResult(False, self.current_term, self.id)
     

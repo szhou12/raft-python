@@ -11,7 +11,7 @@ class Follower(NodeState):
         self.last_applied_index = 0
         self.next_index = 0 # next log entry to be sent by Leader
         self.match_index = 0 # index of highest log entry to be replicated on server
-        self.vote_for = None
+        self.vote_for = None # Candidate ID that I voted
         self.entries = []
     
     def __repr__(self):

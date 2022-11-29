@@ -53,13 +53,12 @@ class Candidate(NodeState):
             for response in grequests.imap(posts):
                 result = response.json()
                 logging.info(f'{self} received vote result: {response.status_code}: {result}')
-                ## NOTE: need to check if works
-                if result[0]:
-                    self.votes.append(result[2])
-                # if result['vote_granted']:
-                #     self.votes.append(result['id'])
-    
+                if result[0]: # result['vote_granted']
+                    self.votes.append(result[2]) # append vote_granted node id
+
+
     def win(self):
+        logging.warning(f'win: votes {len(self.votes)}; total: {len(self.cluster)}')
         return len(self.votes) > len(self.cluster) / 2
     
     def __repr__(self):

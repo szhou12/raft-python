@@ -56,6 +56,20 @@ def hello_raft():
     return f'raft cluster: {cluster}!'
 
 
+#TODO
+@app.route('/status', methods=['GET'])
+def get_status():
+    '''
+    return: {'role': <str>, 'term': <int>}
+    role options: Leader, Candidate, Follower
+    term: the node's current term as an integer
+    '''
+    node_state = timer_thread.node_state
+    role = type(node_state).__name__
+    term = node_state.current_term
+    response = {'role': role, 'term': term}
+    return jsonify(response)
+
 
 def load_conf(filename, node_id, key="addresses"):
     try:
