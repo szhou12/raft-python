@@ -53,7 +53,6 @@ def get_message(topic):
     return jsonify({'success': True, 'message': message})
 
 
-#TODO
 @app.route('/status', methods=['GET'])
 def get_status():
     '''

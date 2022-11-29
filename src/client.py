@@ -82,6 +82,11 @@ def get_status(url, endpoint='status'):
     print('json response', response.json())
 
 
+def hello_raft(url):
+    response = requests.get(f'{url}')
+    print('json response', response.json())
+
+
 IP = '127.0.0.1'
 if __name__ == '__main__':
     try:
@@ -96,6 +101,7 @@ if __name__ == '__main__':
         # get_message(url, topic="math")
         # get_message(url, topic="math")
         get_status(url)
+        hello_raft(url)
         
         
     except KeyboardInterrupt:

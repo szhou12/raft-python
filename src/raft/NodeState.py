@@ -19,7 +19,11 @@ class NodeState:
         '''
         Me as Follower node reacting to Candidate node's vote request
         Args:
-            vote request from candidate
+            vote request from candidate:
+                - term
+                - candidateId
+                - lastLogIndex
+                - lastLogTerm
         Return:
             vote_granted: bool
             term: current_term for candidate to update
@@ -30,6 +34,8 @@ class NodeState:
         '''
         candidate_term = vote_request['term']
         candidate_id = vote_request['candidate_id']
+        candidate_last_log_index = vote_request['last_log_index']
+        candidate_last_log_term = vote_request['last_log_term']
 
         if candidate_term > self.current_term:
             logging.info(f'{self} accepts vote request as Candidate term: {candidate_term} > {self.current_term} (Follower term)')
@@ -45,7 +51,7 @@ class NodeState:
             # TODO: check if the candidate's log is newer than receiver's
             self.vote_for = candidate_id
             return VoteResult(True, self.current_term, self.id)
-            
+
         logging.info(f'{self} rejects vote request as vote_for id: {self.vote_for} != {candidate_id}')
         return VoteResult(False, self.current_term, self.id)
     
