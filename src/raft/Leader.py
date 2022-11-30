@@ -1,6 +1,6 @@
 import time
 from random import randrange
-
+import json
 import grequests
 from .NodeState import NodeState
 from .client import Client
@@ -10,6 +10,26 @@ import logging
 # from .monitor import send_state_update, send_heartbeat
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
+
+class AppenEntriesRequest:
+    def __init__(self, leader):
+        self.term = leader.current_term
+        self.leader_id = leader.id
+        self.entries = leader.entries
+        self.leader_commit = leader.commit_index
+        # TODO: raft log replication
+        self.prev_log_index = 0
+        self.prev_log_term = 0
+    
+    def to_json(self):
+        return json.dumps(
+            self,
+            default=lambda obj: obj.__dict__,
+            sort_keys=True,
+            indent=4
+        )
+
+
 
 class Leader(NodeState):
     def __init__(self, candidate):

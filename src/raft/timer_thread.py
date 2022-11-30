@@ -67,9 +67,17 @@ class TimerThread(threading.Thread):
         logging.info(f'{self} received vote request: {vote_request}')
         vote_result = self.node_state.vote(vote_request)
         logging.info(f'{self} returns vote result: {vote_result}')
+
+        # TODO: update term CHECK correctness
+        if vote_result[1] > self.node_state.current_term:
+            self.node_state.current_term = vote_result[1]
+
         if vote_result[0]: # result['vote_granted']
+            self.node_state.current_term = vote_result[1]
             self.become_follower()
         return vote_result
+    
+    # TODO: append_entries()
     
     def __repr__(self):
         return f'{type(self).__name__, self.node_state}'

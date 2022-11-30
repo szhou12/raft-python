@@ -10,7 +10,7 @@ VoteResult = collections.namedtuple('VoteResult', ['vote_granted', 'term', 'id']
 class NodeState:
     def __init__(self, node=None, cluster=None):
         self.cluster = cluster
-        self.node = node
+        self.node = node # Node(id, uri)
         self.id = node.id
         self.current_term = 0
         self.vote_for = None # Candidate ID that me as Follower voted

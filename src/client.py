@@ -3,8 +3,6 @@ import json
 import sys
 import threading
 
-
-
 headers = {"Content-Type": "application/json"}
 
 def create_topic(url, topic, endpoint='topic'):
