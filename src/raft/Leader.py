@@ -12,12 +12,12 @@ import logging
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 class AppenEntriesRequest:
-    def __init__(self, leader, dst_node): # dst_node = Node(id, uri)
+    def __init__(self, leader, follower_id):
         self.term = leader.current_term
         self.leader_id = leader.id
-        self.prev_log_index = leader.next_index[dst_node] - 1
-        self.prev_log_term = leader.log.get_log_term(leader.next_index[dst_node]-1)
-        self.entries = leader.log.get_entries(leader.next_index[dst_node])
+        self.prev_log_index = leader.next_index[follower_id] - 1
+        self.prev_log_term = leader.log.get_log_term(leader.next_index[follower_id]-1)
+        self.entries = leader.log.get_entries(leader.next_index[follower_id])
         self.leader_commit = leader.commit_index
     
     def to_json(self):
@@ -40,28 +40,53 @@ class Leader(NodeState):
         self.stopped = False
         self.followers = [peer for peer in self.cluster if peer != self.node]
         self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) # no use DELETE???
-        self.next_index = {peer: self.log.last_log_index + 1 for peer in self.followers}
-        self.match_index = {peer: 0 for peer in self.followers}
+        self.next_index = {peer.id: self.log.last_log_index + 1 for peer in self.followers}
+        self.match_index = {peer.id: 0 for peer in self.followers}
 
 
     def heartbeat(self):
         while not self.stopped:
             logging.info(f'{self} sending heartbeat to followers...')
             logging.info('====================================================>')
-            # send_heartbeat(self, HEARTBEAT_INTERVAL) # TODO: implement this
             client = Client()
             with client as session:
+                # posts = [
+                #     grequests.post(f'{peer.uri}/raft/heartbeat', json=self.node, session=session)
+                #     for peer in self.followers
+                # ]
+                # for response in grequests.map(posts, gtimeout=HEARTBEAT_INTERVAL): # stop waiting for response after heartbeat time
+                #     if response is not None:
+                #         logging.info(f'{self} received heartbeat response from follower: {response.json()}')
+                #     else:
+                #         logging.info(f'{self} received heartbeat response from follower: None')
+
                 posts = [
-                    grequests.post(f'{peer.uri}/raft/heartbeat', json=self.node, session=session)
+                    grequests.post(f'{peer.uri}/raft/heartbeat', json=AppenEntriesRequest(self, peer.id).to_json(), session=session)
                     for peer in self.followers
                 ]
-                for response in grequests.map(posts, gtimeout=HEARTBEAT_INTERVAL): # stop waiting for response after heartbeat time
+                for response in grequests.map(posts, gtimeout=HEARTBEAT_INTERVAL):
                     if response is not None:
-                        logging.info(f'{self} received heartbeat response from follower: {response.json()}')
+                        result = response.json()
+                        logging.info(f'{self} received heartbeat response from follower: {result}')
+                        if result[0]: # result['success'] == True
+                            self.match_index[result[2]] = self.next_index.get(result[2])
+                            self.next_index[result[2]] = self.log.last_log_index + 1
+                        else:
+                            self.next_index[result[2]] -= 1
+
                     else:
                         logging.info(f'{self} received heartbeat response from follower: None')
 
-            logging.info('==================================================END')
+            logging.info('=====================================================')
+            N = self.commit_index + 1
+            count = 0
+            for id in self.match_index:
+                if self.match_index[id] >= N:
+                    count += 1
+                if count >= len(self.followers) // 2:
+                    self.commit_index = N
+                    logging.info(f'{self} commits, commit index: {self.commit_index}')
+                    break
             time.sleep(HEARTBEAT_INTERVAL)
     
     def __repr__(self):

@@ -81,10 +81,12 @@ class NodeState:
     
     def client_append_entries(self, client_request):
         '''
-        Me as Leader node reacting to client's request 
+        Me as Leader node reacting to client's request
         Leader Rule #2:
             If command received from client: append entry to local log, 
             respond after entry applied to state machine
+        Arg:
+            client_request: str
         '''
         new_entry = {"message": client_request, "term": self.current_term}
         self.log.append_entries(self.log.last_log_index, [new_entry])
@@ -93,7 +95,7 @@ class NodeState:
     
     def append_entries(self, append_entries_request):
         leader_term = append_entries_request['term']
-        leader_id = append_entries_request['leader_id']
+        # leader_id = append_entries_request['leader_id']
         leader_prev_log_index = append_entries_request['prev_log_index']
         leader_prev_log_term = append_entries_request['prev_log_term']
         leader_entries = append_entries_request['entries']
@@ -113,7 +115,7 @@ class NodeState:
             # result = AppendEntriesResult(True, self.current_term, self.id)
             result = result._replace(success=True)
         else:
-            if leader_prev_log_term != self.log.get_log_term([leader_prev_log_index]):
+            if leader_prev_log_term != self.log.get_log_term(leader_prev_log_index):
                 logging.info(f'{self} rejects append entries request as index not match or term not match')
                 self.log.delete_entries(leader_prev_log_index)
             else:
@@ -124,7 +126,7 @@ class NodeState:
         # Append Entries Rule 5: reset Follower's commit index
         if leader_commit_index > self.commit_index:
             self.commit_index = min(leader_commit_index, self.log.last_log_index)
-            logging.info(f'{self} reset commit index: {self.commit_index}')
+            logging.info(f'{self} commits, commit index: {self.commit_index}')
         
         return result
         

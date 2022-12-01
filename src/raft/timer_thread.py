@@ -79,9 +79,16 @@ class TimerThread(threading.Thread):
         return vote_result
     
     # TODO: invoked in app2.py
-    # leader rule 2: Leader responding to client
+    # Leader rule 2: Leader responding to client
     def client_append_entries(self, client_request):
+        '''
+        Add client's PUT request to Leader's local log
+        Arg:
+            client_request: str
+        '''
         result = self.node_state.client_append_entries(client_request)
+
+        # TODO: pending return until leader commit????
         return result
     
     def append_entries(self, append_entries_request: AppenEntriesRequest):
@@ -95,7 +102,9 @@ class TimerThread(threading.Thread):
         
         if append_result[0]: # result['success']
             self.node_state.current_term = append_result[1]
-            self.become_follower()
+            self.become_follower() # TODO: outside if ????
+            # set leader id
+            self.node_state.leader = append_entries_request['leader_id']
         
         return append_result
 

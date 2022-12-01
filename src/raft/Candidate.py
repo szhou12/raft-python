@@ -53,7 +53,7 @@ class Candidate(NodeState):
             for response in grequests.imap(posts):
                 result = response.json()
                 logging.info(f'{self} received vote result: {response.status_code}: {result}')
-                if result[0]: # result['vote_granted']
+                if result[0]: # result['vote_granted'] == True
                     self.votes.append(result[2]) # append vote_granted node id
 
 

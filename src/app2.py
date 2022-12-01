@@ -49,7 +49,7 @@ def heartbeat():
     # timer_thread.become_follower() # once receives heartbeat, this node maintains as Follower
     # return jsonify(response)
     
-    ## TODO: currently implementing
+    ## TODO: currently TESTing
     append_entries_request = request.get_json()
     result = timer_thread.append_entries(json.loads(append_entries_request))
     return jsonify(result)
@@ -77,8 +77,8 @@ def get_all_topics():
     
     # TODO NEED TO CHECK GET request string
     # add to Leader's local log
-    client_request = request.get_json()
-    timer_thread.client_append_entries(client_request)
+    # client_request = request.get_json()
+    # timer_thread.client_append_entries(client_request)
 
     topic_list = list(topics.keys())
     print(topic_list)
@@ -95,18 +95,26 @@ def add_new_topic():
     if not_leader():
         return jsonify({'success': False})
 
-    # TODO NEED TO CHECK GET request string
-    # add to Leader's local log
+    # TODO
     client_request = request.get_json()
-    timer_thread.client_append_entries(client_request)
-
-    new_topic = request.json['topic']
+    new_topic = client_request['topic']
 
     if new_topic in topics:
         return jsonify({'success': False})
-    
+
+    # add to Leader's local log
+    timer_thread.client_append_entries(json.dumps(client_request))
+
+    # wait until Leader commit confirmed, write to database
     topics[new_topic] = []
     return jsonify({'success': True})
+
+    # NOTE: old
+    # new_topic = request.json['topic']
+    # if new_topic in topics:
+    #     return jsonify({'success': False})
+    # topics[new_topic] = []
+    # return jsonify({'success': True})
 
 
 @app.route('/message', methods=['PUT'])
@@ -114,18 +122,28 @@ def add_message():
     if not_leader():
         return jsonify({'success': False})
     
-    # TODO NEED TO CHECK GET request string
-    # add to Leader's local log
+    # TODO
     client_request = request.get_json()
-    timer_thread.client_append_entries(client_request)
+    topic = client_request['topic']
 
-    topic = request.json['topic']
     if topic not in topics:
         return jsonify({'success': False})
     
-    message = request.json['message']
-    topics[topic].append(message)
+    # add to Leader's local log
+    timer_thread.client_append_entries(json.dumps(client_request))
+
+    # wait until Leader commit confirmed, write to database
+    topics[topic].append(client_request['message'])
     return jsonify({'success': True})
+
+    # NOTE: old
+    # topic = request.json['topic']
+    # if topic not in topics:
+    #     return jsonify({'success': False})
+    
+    # message = request.json['message']
+    # topics[topic].append(message)
+    # return jsonify({'success': True})
 
 
 @app.route('/message/<topic>', methods=['GET'])
@@ -135,8 +153,8 @@ def get_message(topic):
     
     # TODO NEED TO CHECK GET request string
     # add to Leader's local log
-    client_request = request.get_json()
-    timer_thread.client_append_entries(client_request)
+    # client_request = request.get_json()
+    # timer_thread.client_append_entries(client_request)
 
     if topic not in topics or len(topics[topic]) == 0:
         return jsonify({'success': False, 'message': ''})
