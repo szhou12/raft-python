@@ -8,7 +8,7 @@ import logging
 from .cluster import ELECTION_TIMEOUT_MAX
 from .Candidate import Candidate, VoteRequest
 from .Follower import Follower
-from .Leader import Leader
+from .Leader import Leader, AppenEntriesRequest
 
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
@@ -59,25 +59,47 @@ class TimerThread(threading.Thread):
         self.node_state = Leader(self.node_state)
         self.node_state.heartbeat()
     
+    # invoked in app2.py
     def vote(self, vote_request: VoteRequest):
         '''
-        As Follower, vote for Candidate
+        As Follower (node_state), vote for Candidate
         Invoke NodeState.vote()
         '''
         logging.info(f'{self} received vote request: {vote_request}')
         vote_result = self.node_state.vote(vote_request)
         logging.info(f'{self} returns vote result: {vote_result}')
 
-        # TODO: update term CHECK correctness
-        if vote_result[1] > self.node_state.current_term:
-            self.node_state.current_term = vote_result[1]
+        # TODO: 11/29 added - update term CHECK correctness
+        # if vote_result[1] > self.node_state.current_term:
+        #     self.node_state.current_term = vote_result[1]
 
         if vote_result[0]: # result['vote_granted']
             self.node_state.current_term = vote_result[1]
             self.become_follower()
         return vote_result
     
-    # TODO: append_entries()
+    # TODO: invoked in app2.py
+    # leader rule 2: Leader responding to client
+    def client_append_entries(self, client_request):
+        result = self.node_state.client_append_entries(client_request)
+        return result
+    
+    def append_entries(self, append_entries_request: AppenEntriesRequest):
+        '''
+        As Follower (node_state), append entries from Leader log or receive heartbeat
+        Invoke NodeState.append_entries()
+        '''
+        logging.info(f'{self} received append entries request: {append_entries_request}')
+        append_result = self.node_state.append_entries(append_entries_request)
+        logging.info(f'{self} returns append entries result: {append_result}')
+        
+        if append_result[0]: # result['success']
+            self.node_state.current_term = append_result[1]
+            self.become_follower()
+        
+        return append_result
+
+
     
     def __repr__(self):
         return f'{type(self).__name__, self.node_state}'

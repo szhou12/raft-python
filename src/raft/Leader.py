@@ -12,14 +12,13 @@ import logging
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 class AppenEntriesRequest:
-    def __init__(self, leader):
+    def __init__(self, leader, dst_node): # dst_node = Node(id, uri)
         self.term = leader.current_term
         self.leader_id = leader.id
-        self.entries = leader.entries
+        self.prev_log_index = leader.next_index[dst_node] - 1
+        self.prev_log_term = leader.log.get_log_term(leader.next_index[dst_node]-1)
+        self.entries = leader.log.get_entries(leader.next_index[dst_node])
         self.leader_commit = leader.commit_index
-        # TODO: raft log replication
-        self.prev_log_index = 0
-        self.prev_log_term = 0
     
     def to_json(self):
         return json.dumps(
@@ -34,13 +33,16 @@ class AppenEntriesRequest:
 class Leader(NodeState):
     def __init__(self, candidate):
         super(Leader, self).__init__(candidate.node, candidate.cluster)
-        self.current_term = candidate.current_term
-        self.commit_index = candidate.commit_index
-        self.last_applied_index = candidate.last_applied_index
-        self.entries = candidate.entries
+        self.current_term = candidate.current_term # read from persistent data????
+        # self.commit_index = candidate.commit_index
+        # self.last_applied_index = candidate.last_applied_index
+        # self.entries = candidate.entries
         self.stopped = False
         self.followers = [peer for peer in self.cluster if peer != self.node]
-        self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
+        self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) # no use DELETE???
+        self.next_index = {peer: self.log.last_log_index + 1 for peer in self.followers}
+        self.match_index = {peer: 0 for peer in self.followers}
+
 
     def heartbeat(self):
         while not self.stopped:
@@ -63,4 +65,4 @@ class Leader(NodeState):
             time.sleep(HEARTBEAT_INTERVAL)
     
     def __repr__(self):
-        return f'{type(self).__name__, self.node.id, self.current_term}'
+        return f'{type(self).__name__}, id={self.node.id}, term={self.current_term}'

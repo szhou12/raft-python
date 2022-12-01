@@ -11,8 +11,8 @@ class VoteRequest:
         self.candidate_id = candidate.id
         self.term = candidate.current_term
         # TODO: init log info when implement raft log replication
-        self.last_log_index = 0
-        self.last_log_term = 0
+        # self.last_log_index = candidate.log.last_log_index
+        # self.last_log_term = candidate.log.last_log_term
     
     def to_json(self):
         return json.dumps(
@@ -25,11 +25,11 @@ class VoteRequest:
 class Candidate(NodeState):
     def __init__(self, follower):
         super(Candidate, self).__init__(follower.node, follower.cluster)
-        self.current_term = follower.current_term
-        self.commit_index = follower.commit_index
-        self.last_applied_index = follower.last_applied_index
+        self.current_term = follower.current_term # read from persistent data????
+        # self.commit_index = follower.commit_index
+        # self.last_applied_index = follower.last_applied_index
         self.votes = []
-        self.entries = follower.entries
+        # self.entries = follower.entries
         self.followers = [peer for peer in self.cluster if peer != self.node]
         self.vote_for = self.id # Candidate always votes itself
     
@@ -62,7 +62,8 @@ class Candidate(NodeState):
         return len(self.votes) > len(self.cluster) / 2
     
     def __repr__(self):
-        return f'{type(self).__name__, self.node.id, self.current_term}'
+        # return f'{type(self).__name__, self.node.id, self.current_term}'
+        return f'{type(self).__name__}, id={self.node.id}, term={self.current_term}'
 
                 
 
