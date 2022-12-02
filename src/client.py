@@ -91,15 +91,17 @@ if __name__ == '__main__':
         port = int(sys.argv[1].strip())
         url = f'http://{IP}:{port}'
 
-        # create_topic(url, topic="math")
-        # get_topics(url)
-        # add_message(url, topic="math", message='hello')
-        # add_message(url, topic="math", message='world')
-        # get_message(url, topic="math")
-        # get_message(url, topic="math")
-        # get_message(url, topic="math")
+        create_topic(url, topic="math")
+        get_topics(url)
+        add_message(url, topic="math", message='hello')
+        add_message(url, topic="math", message='world')
+        get_message(url, topic="math")
+        get_message(url, topic="math")
+        get_message(url, topic="math")
+
+        ## TEST Election Algorithm
         get_status(url)
-        hello_raft(url)
+        # hello_raft(url)
         
         
     except KeyboardInterrupt:

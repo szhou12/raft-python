@@ -151,17 +151,27 @@ def get_message(topic):
     if not_leader():
         return jsonify({'success': False, 'message': ''})
     
-    # TODO NEED TO CHECK GET request string
-    # add to Leader's local log
-    # client_request = request.get_json()
-    # timer_thread.client_append_entries(client_request)
-
     if topic not in topics or len(topics[topic]) == 0:
         return jsonify({'success': False, 'message': ''})
-    
+
+    # NOTE: 
+    # This GET method consumes MQ, 
+    # thus considered as WRITE operation and needed to be logged
+    client_request = {"topic":topic, "op":"POP"}
+    # add to Leader's local log
+    timer_thread.client_append_entries(json.dumps(client_request))
     message = topics[topic][0]
     topics[topic] = topics[topic][1:]
     return jsonify({'success': True, 'message': message})
+
+
+    # NOTE: old
+    # if topic not in topics or len(topics[topic]) == 0:
+    #     return jsonify({'success': False, 'message': ''})
+    
+    # message = topics[topic][0]
+    # topics[topic] = topics[topic][1:]
+    # return jsonify({'success': True, 'message': message})
 
 
 @app.route('/status', methods=['GET'])

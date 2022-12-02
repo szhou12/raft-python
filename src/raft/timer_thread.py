@@ -2,9 +2,6 @@ import sys
 import threading
 from random import randrange
 import logging
-
-# from monitor import send_state_update
-
 from .cluster import ELECTION_TIMEOUT_MAX
 from .Candidate import Candidate, VoteRequest
 from .Follower import Follower
@@ -20,7 +17,7 @@ class TimerThread(threading.Thread):
         self.cluster = cluster
         self.node = cluster[node_id]
         self.node_state = Follower(self.node, self.cluster)
-        self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
+        self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * .001
         self.election_timer = threading.Timer(self.election_timeout, self.become_candidate)
     
     def run(self):
@@ -33,7 +30,7 @@ class TimerThread(threading.Thread):
     def become_follower(self):
         # Follower becomes Candidate after timeout collapses
         # randomizes timeout in case of >2 nodes timeout at the same time
-        timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
+        timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * .001
         if type(self.node_state) != Follower:
             logging.info(f'{self} now becomes Follower...')
             self.node_state = Follower(self.node, self.cluster)
@@ -45,7 +42,6 @@ class TimerThread(threading.Thread):
     def become_candidate(self):
         logging.warning(f'Heartbeat is timeout: {int(self.election_timeout)}s')
         logging.info(f'{self} becomes Candidate and starts requesting votes...')
-        # send_state_update(self.node_state, self.election_timeout) # TODO: implement this
         self.node_state = Candidate(self.node_state)
         self.node_state.elect()
         if self.node_state.win():
@@ -55,7 +51,6 @@ class TimerThread(threading.Thread):
     
     def become_leader(self):
         logging.info(f'{self} beomes Leader and starts sending heartbeat...')
-        # send_state_update(self.node_state, self.election_timeout) # TODO: implement this
         self.node_state = Leader(self.node_state)
         self.node_state.heartbeat()
     
@@ -68,10 +63,6 @@ class TimerThread(threading.Thread):
         logging.info(f'{self} received vote request: {vote_request}')
         vote_result = self.node_state.vote(vote_request)
         logging.info(f'{self} returns vote result: {vote_result}')
-
-        # TODO: 11/29 added - update term CHECK correctness
-        # if vote_result[1] > self.node_state.current_term:
-        #     self.node_state.current_term = vote_result[1]
 
         if vote_result[0]: # result['vote_granted']
             self.node_state.current_term = vote_result[1]
@@ -100,11 +91,16 @@ class TimerThread(threading.Thread):
         append_result = self.node_state.append_entries(append_entries_request)
         logging.info(f'{self} returns append entries result: {append_result}')
         
-        if append_result[0]: # result['success']
-            self.node_state.current_term = append_result[1]
-            self.become_follower() # TODO: outside if ????
-            # set leader id
-            self.node_state.leader = append_entries_request['leader_id']
+        # if append_result[0]: # result['success']
+        #     self.node_state.current_term = append_result[1]
+        #     self.become_follower() # TODO: outside if ????
+        #     # set leader id
+        #     self.node_state.leader = append_entries_request['leader_id']
+        
+        self.node_state.current_term = append_result[1]
+        self.become_follower() # Follower remains its role
+        # set leader id
+        self.node_state.leader = append_entries_request['leader_id']
         
         return append_result
 

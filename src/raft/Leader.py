@@ -40,7 +40,7 @@ class Leader(NodeState):
         # self.entries = candidate.entries
         self.stopped = False
         self.followers = [peer for peer in self.cluster if peer != self.node]
-        self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) # no use DELETE???
+        # self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) # no use DELETE???
         self.next_index = {peer.id: self.log.last_log_index + 1 for peer in self.followers}
         self.match_index = {peer.id: 0 for peer in self.followers}
 
@@ -74,6 +74,7 @@ class Leader(NodeState):
                             self.next_index[result[2]] = self.log.last_log_index + 1
                         else:
                             self.next_index[result[2]] -= 1
+                            self.next_index[result[2]] = max(0, self.next_index[result[2]]) # ?????
 
                     else:
                         logging.info(f'{self} received heartbeat response from follower: None')
