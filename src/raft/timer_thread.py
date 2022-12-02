@@ -2,7 +2,7 @@ import sys
 import threading
 from random import randrange
 import logging
-from .cluster import ELECTION_TIMEOUT_MAX
+from .cluster import ELECTION_TIMEOUT_MAX, TIMEOUT_SCALER
 from .Candidate import Candidate, VoteRequest
 from .Follower import Follower
 from .Leader import Leader, AppenEntriesRequest
@@ -10,14 +10,13 @@ from .Leader import Leader, AppenEntriesRequest
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
-
 class TimerThread(threading.Thread):
     def __init__(self, node_id, cluster):
         threading.Thread.__init__(self)
         self.cluster = cluster
         self.node = cluster[node_id]
         self.node_state = Follower(self.node, self.cluster)
-        self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * .001
+        self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * TIMEOUT_SCALER
         self.election_timer = threading.Timer(self.election_timeout, self.become_candidate)
     
     def run(self):
@@ -30,7 +29,7 @@ class TimerThread(threading.Thread):
     def become_follower(self):
         # Follower becomes Candidate after timeout collapses
         # randomizes timeout in case of >2 nodes timeout at the same time
-        timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * .001
+        timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * TIMEOUT_SCALER
         if type(self.node_state) != Follower:
             logging.info(f'{self} now becomes Follower...')
             self.node_state = Follower(self.node, self.cluster)

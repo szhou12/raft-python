@@ -17,4 +17,4 @@ build/
 .idea/
 docs/_build/
 .vscode
-data/
+src/data/
