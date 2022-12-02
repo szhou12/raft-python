@@ -200,6 +200,11 @@ if __name__ == '__main__':
         # NODE_ID = int(os.environ.get('NODE_ID'))
         cluster = Cluster(addrs)
         node = cluster[node_id]
+
+        storage_path = './raft/data'
+        if not os.path.exists(storage_path):
+            os.makedirs(storage_path)
+
         timer_thread = TimerThread(node_id, cluster)
         # app = create_app()
         timer_thread.start()

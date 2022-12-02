@@ -25,13 +25,15 @@ class VoteRequest:
 class Candidate(NodeState):
     def __init__(self, follower):
         super(Candidate, self).__init__(follower.node, follower.cluster)
-        self.current_term = follower.current_term # read from persistent data????
+        self.current_term = follower.current_term
+        self.vote_for = self.id # Candidate always votes itself
+        self.save()
         # self.commit_index = follower.commit_index
         # self.last_applied_index = follower.last_applied_index
         self.votes = []
         # self.entries = follower.entries
         self.followers = [peer for peer in self.cluster if peer != self.node]
-        self.vote_for = self.id # Candidate always votes itself
+        
     
     def elect(self):
         '''
@@ -43,6 +45,7 @@ class Candidate(NodeState):
         '''
         self.current_term += 1
         self.votes.append(self.node) # vote itself
+        self.save()
         logging.info(f'{self} sending vote requests to peers...')
         client = Client() # init an http client
         with client as session:

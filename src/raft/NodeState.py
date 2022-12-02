@@ -1,5 +1,7 @@
 import collections
 
+import os
+import json
 from .cluster import Cluster
 from .Log import Log
 import logging
@@ -9,18 +11,58 @@ logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H
 VoteResult = collections.namedtuple('VoteResult', ['vote_granted', 'term', 'id'])
 AppendEntriesResult = collections.namedtuple('AppendEntriesResult', ['success', 'term', 'id'])
 
+STORAGE_PATH = 'data'
+
 class NodeState:
     def __init__(self, node=None, cluster=None):
         self.cluster = cluster
         self.node = node # Node(id, uri)
         self.id = node.id
-        self.current_term = 0
-        self.vote_for = None # Candidate ID that me as Follower voted
-        self.log = Log() # log_entries[]
+        
+        ## Volatile state
         self.commit_index = 0
         self.last_applied_index = 0
-    
 
+        ## Persistent state
+        if not os.path.exists(STORAGE_PATH):
+            os.makedirs(STORAGE_PATH)
+
+        self.current_term = 0
+        self.vote_for = None # Candidate ID that me as Follower voted
+        self.load()
+        log_filename = os.path.join(STORAGE_PATH, f'{self.id}_log.json')
+        self.log = Log(log_filename) # log_entries[]
+    
+    def load(self):
+        '''
+        Read persistent states from storage:
+            - current_term 
+            - vote_for
+        '''
+        filename = os.path.join(STORAGE_PATH, f'{self.id}_states.json')
+        if os.path.exists(filename):
+            with open(filename, 'r') as f:
+                data = json.load(f)
+            self.current_term = data['current_term']
+            self.vote_for = data['vote_for']
+        else:
+            self.save()
+    
+    def save(self):
+        '''
+        Save persistent states from storage:
+            - current_term 
+            - vote_for
+        '''
+        data = {
+            'current_term': self.current_term,
+            'vote_for': self.vote_for
+        }
+        filename = os.path.join(STORAGE_PATH, f'{self.id}_states.json')
+        with open(filename, 'w') as f:
+            json.dump(data, f, indent=4)
+
+    
     def vote(self, vote_request):
         '''
         Me as Follower node reacting to Candidate node's vote request
@@ -47,6 +89,7 @@ class NodeState:
             logging.info(f'{self} accepts vote request as Candidate term: {candidate_term} > {self.current_term}')
             self.vote_for = candidate_id
             self.current_term = candidate_term
+            self.save()
             return VoteResult(True, self.current_term, self.id)
 
         if candidate_term < self.current_term:
@@ -62,10 +105,12 @@ class NodeState:
             if candidate_last_log_index >= self.log.last_log_index and candidate_last_log_term >= self.log.last_log_term:
                 logging.info(f'{self} accepts vote request as Candidate log is newer')
                 self.vote_for = candidate_id
+                self.save()
                 return VoteResult(True, self.current_term, self.id)
             else:
                 logging.info(f'{self} rejects vote request as Candidate log too old')
                 self.vote_for = None
+                self.save()
                 return VoteResult(False, self.current_term, self.id)
 
         logging.info(f'{self} rejects vote request as vote_for id: {self.vote_for} != {candidate_id}')
@@ -104,6 +149,7 @@ class NodeState:
         # All Servers Rule 2
         if leader_term > self.current_term:
             self.current_term = leader_term
+            self.save()
 
         if leader_term < self.current_term:
             logging.info(f'{self} rejects append entries request as Leader term: {leader_term} < {self.current_term}')

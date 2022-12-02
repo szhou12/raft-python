@@ -7,7 +7,6 @@ from .client import Client
 from .cluster import HEARTBEAT_INTERVAL, ELECTION_TIMEOUT_MAX
 import logging
 
-# from .monitor import send_state_update, send_heartbeat
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
@@ -33,7 +32,9 @@ class AppenEntriesRequest:
 class Leader(NodeState):
     def __init__(self, candidate):
         super(Leader, self).__init__(candidate.node, candidate.cluster)
-        self.current_term = candidate.current_term # read from persistent data????
+        self.current_term = candidate.current_term
+        self.vote_for = None # once node becomes Leader, reset vote_for=None
+        self.save()
         # self.commit_index = candidate.commit_index
         # self.last_applied_index = candidate.last_applied_index
         # self.entries = candidate.entries
