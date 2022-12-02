@@ -11,7 +11,7 @@ logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H
 VoteResult = collections.namedtuple('VoteResult', ['vote_granted', 'term', 'id'])
 AppendEntriesResult = collections.namedtuple('AppendEntriesResult', ['success', 'term', 'id'])
 
-STORAGE_PATH = 'data'
+STORAGE_PATH = './data'
 
 class NodeState:
     def __init__(self, node=None, cluster=None):

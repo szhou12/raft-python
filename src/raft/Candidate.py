@@ -11,8 +11,8 @@ class VoteRequest:
         self.candidate_id = candidate.id
         self.term = candidate.current_term
         # TODO: init log info when implement raft log replication
-        # self.last_log_index = candidate.log.last_log_index
-        # self.last_log_term = candidate.log.last_log_term
+        self.last_log_index = candidate.log.last_log_index
+        self.last_log_term = candidate.log.last_log_term
     
     def to_json(self):
         return json.dumps(
