@@ -1,11 +1,14 @@
-from .test_utils import Swarm, Node, LEADER, FOLLOWER, CANDIDATE
+from test_utils import Swarm, Node, LEADER, FOLLOWER, CANDIDATE
 import pytest
 import time
 import requests
+import os
+import glob
 
 # seconds the program will wait after starting a node for election to happen
-# it is set conservatively, you will likely be able to lower it for faster tessting
-ELECTION_TIMEOUT = 2.0
+# it is set conservatively, you will likely be able to lower it for faster testing
+# ELECTION_TIMEOUT = 2.0
+ELECTION_TIMEOUT = 0.3 # 300ms
 
 # array of numbr of nodes spawned on tests, an example could be [3,5,7,11,...]
 # default is only 5 for faster tests
@@ -16,8 +19,21 @@ NUM_NODES_ARRAY = [5]
 PROGRAM_FILE_PATH = "src/node.py"
 
 
+def clean_persistent_data():
+    '''
+    Before starting a test, remove persistent data from the previous test first
+    '''
+    files = glob.glob('./data/*.json', recursive=True)
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError as e:
+            print("Error: %s : %s" % (f, e.strerror))
+
 @pytest.fixture
 def swarm(num_nodes):
+    clean_persistent_data()
+
     swarm = Swarm(PROGRAM_FILE_PATH, num_nodes)
     swarm.start(ELECTION_TIMEOUT)
     yield swarm

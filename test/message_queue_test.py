@@ -12,15 +12,20 @@ TEST_MESSAGE = "Test Message"
 PROGRAM_FILE_PATH = "src/node.py"
 ELECTION_TIMEOUT = 2.0
 
-@pytest.fixture
-def node_with_test_topic():
-    # delete persistent data from previous test first
+def clean_persistent_data():
+    '''
+    Before starting a test, remove persistent data from the previous test first
+    '''
     files = glob.glob('./data/*.json', recursive=True)
     for f in files:
         try:
             os.remove(f)
         except OSError as e:
             print("Error: %s : %s" % (f, e.strerror))
+
+@pytest.fixture
+def node_with_test_topic():
+    clean_persistent_data()
 
     node = Swarm(PROGRAM_FILE_PATH, 1)[0]
     node.start()
@@ -32,13 +37,7 @@ def node_with_test_topic():
 
 @pytest.fixture
 def node():
-    # delete persistent data from previous test first
-    files = glob.glob('./data/*.json', recursive=True)
-    for f in files:
-        try:
-            os.remove(f)
-        except OSError as e:
-            print("Error: %s : %s" % (f, e.strerror))
+    clean_persistent_data()
 
     node = Swarm(PROGRAM_FILE_PATH, 1)[0]
     node.start()
