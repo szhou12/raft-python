@@ -1,8 +1,8 @@
-import sys
+import time
 import threading
 from random import randrange
 import logging
-from .cluster import ELECTION_TIMEOUT_MAX, TIMEOUT_SCALER
+from .cluster import ELECTION_TIMEOUT_MAX, TIMEOUT_SCALER, HEARTBEAT_INTERVAL
 from .Candidate import Candidate, VoteRequest
 from .Follower import Follower
 from .Leader import Leader, AppenEntriesRequest
@@ -78,8 +78,17 @@ class TimerThread(threading.Thread):
         '''
         result = self.node_state.client_append_entries(client_request)
 
-        # TODO: pending return until leader commit????
+        # NOTE: postpone response to client until entry applied to state machine
+        time.sleep(HEARTBEAT_INTERVAL)
         return result
+    
+    def fetch_MQ(self):
+        '''
+        MQ saved in log, fetch the latest commited (commit_index - 1) MQ from Leader's log
+        '''
+        result = self.node_state.fetch_MQ()
+        return result
+
     
     def append_entries(self, append_entries_request: AppenEntriesRequest):
         '''

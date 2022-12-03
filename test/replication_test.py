@@ -2,6 +2,8 @@ from test_utils import Swarm, Node, LEADER, FOLLOWER, CANDIDATE
 import pytest
 import time
 import requests
+import os
+import glob
 
 NUM_NODES_ARRAY = [5]
 PROGRAM_FILE_PATH = "src/node.py"
@@ -12,8 +14,21 @@ ELECTION_TIMEOUT = 2.0
 NUMBER_OF_LOOP_FOR_SEARCHING_LEADER = 3
 
 
+def clean_persistent_data():
+    '''
+    Before starting a test, remove persistent data from the previous test first
+    '''
+    files = glob.glob('./data/*.json', recursive=True)
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError as e:
+            print("Error: %s : %s" % (f, e.strerror))
+
 @pytest.fixture
 def swarm(num_nodes):
+    clean_persistent_data()
+    
     swarm = Swarm(PROGRAM_FILE_PATH, num_nodes)
     swarm.start(ELECTION_TIMEOUT)
     yield swarm

@@ -17,5 +17,9 @@ build/
 .idea/
 docs/_build/
 .vscode
+
+# Specific files no need to upload
 src/data/
 data/
+config_test.json
+config.json

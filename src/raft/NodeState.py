@@ -138,6 +138,13 @@ class NodeState:
         logging.info(f'{self} append new entry to local log from client request: {client_request}')
         return {'success': True}
     
+    def fetch_MQ(self):
+        '''
+        Me as Leader node reacting to client's request, fetching latest commited MQ
+        MQ info saved in self.log
+        '''
+        return self.log.get_log_message(self.commit_index - 1)
+    
     def append_entries(self, append_entries_request):
         leader_term = append_entries_request['term']
         # leader_id = append_entries_request['leader_id']

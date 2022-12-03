@@ -26,6 +26,14 @@ class Log:
         else:
             return self.entries[log_index]["term"]
         
+
+    def get_log_message(self, log_index):
+        if log_index < 0 or log_index >= len(self.entries):
+            empty = {}
+            return json.dumps(empty)
+        else:
+            return self.entries[log_index]["message"]
+        
     def get_entries(self, next_index):
         return self.entries[max(0, next_index):]
     

@@ -68,7 +68,7 @@ def hello_raft():
 
 
 ###### Functions for communication between Server and Client
-topics = {}
+# topics = {}
 
 @app.route('/topic', methods=['GET'])
 def get_all_topics():
@@ -79,6 +79,8 @@ def get_all_topics():
     # add to Leader's local log
     # client_request = request.get_json()
     # timer_thread.client_append_entries(client_request)
+
+    topics = json.loads(timer_thread.fetch_MQ())
 
     topic_list = list(topics.keys())
     # print(topic_list)
@@ -99,18 +101,32 @@ def add_new_topic():
         return jsonify({'success': False})
 
     # TODO
+    topics = json.loads(timer_thread.fetch_MQ())
+
     client_request = request.get_json()
     new_topic = client_request['topic']
 
     if new_topic in topics:
         return jsonify({'success': False})
-
-    # add to Leader's local log
-    timer_thread.client_append_entries(json.dumps(client_request))
-
-    # wait until Leader commit confirmed, write to database
+    
     topics[new_topic] = []
+    # add to Leader's local log
+    timer_thread.client_append_entries(json.dumps(topics))
     return jsonify({'success': True})
+
+    # NOTE: old2
+    # client_request = request.get_json()
+    # new_topic = client_request['topic']
+
+    # if new_topic in topics:
+    #     return jsonify({'success': False})
+
+    # # add to Leader's local log
+    # timer_thread.client_append_entries(json.dumps(client_request))
+
+    # # wait until Leader commit confirmed, write to database
+    # topics[new_topic] = []
+    # return jsonify({'success': True})
 
     # NOTE: old
     # new_topic = request.json['topic']
@@ -124,20 +140,34 @@ def add_new_topic():
 def add_message():
     if not_leader():
         return jsonify({'success': False})
-    
-    # TODO
+
+    topics = json.loads(timer_thread.fetch_MQ())
+
     client_request = request.get_json()
     topic = client_request['topic']
 
     if topic not in topics:
         return jsonify({'success': False})
     
-    # add to Leader's local log
-    timer_thread.client_append_entries(json.dumps(client_request))
-
-    # wait until Leader commit confirmed, write to database
     topics[topic].append(client_request['message'])
+
+    # add to Leader's local log
+    timer_thread.client_append_entries(json.dumps(topics))
     return jsonify({'success': True})
+    
+    # NOTE: old2
+    # client_request = request.get_json()
+    # topic = client_request['topic']
+
+    # if topic not in topics:
+    #     return jsonify({'success': False})
+    
+    # # add to Leader's local log
+    # timer_thread.client_append_entries(json.dumps(client_request))
+
+    # # wait until Leader commit confirmed, write to database
+    # topics[topic].append(client_request['message'])
+    # return jsonify({'success': True})
 
     # NOTE: old
     # topic = request.json['topic']
@@ -152,22 +182,32 @@ def add_message():
 @app.route('/message/<topic>', methods=['GET'])
 def get_message(topic):
     if not_leader():
-        # return jsonify({'success': False, 'message': ''})
-        return jsonify({'success': False})
-    
-    if topic not in topics or len(topics[topic]) == 0:
-        # return jsonify({'success': False, 'message': ''})
         return jsonify({'success': False})
 
-    # NOTE: 
-    # This GET method consumes MQ, 
-    # thus considered as WRITE operation and needed to be logged
-    client_request = {"topic":topic, "op":"POP"}
-    # add to Leader's local log
-    timer_thread.client_append_entries(json.dumps(client_request))
+    topics = json.loads(timer_thread.fetch_MQ())
+
+    if topic not in topics or len(topics[topic]) == 0:
+        return jsonify({'success': False})
+    
     message = topics[topic][0]
     topics[topic] = topics[topic][1:]
+    # add to Leader's local log
+    timer_thread.client_append_entries(json.dumps(topics))
     return jsonify({'success': True, 'message': message})
+    
+    # NOTE: old2
+    # if topic not in topics or len(topics[topic]) == 0:
+    #     return jsonify({'success': False})
+
+    # # NOTE: 
+    # # This GET method consumes MQ, 
+    # # thus considered as WRITE operation and needed to be logged
+    # client_request = {"topic":topic, "op":"POP"}
+    # # add to Leader's local log
+    # timer_thread.client_append_entries(json.dumps(client_request))
+    # message = topics[topic][0]
+    # topics[topic] = topics[topic][1:]
+    # return jsonify({'success': True, 'message': message})
 
 
     # NOTE: old

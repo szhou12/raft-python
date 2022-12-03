@@ -80,6 +80,14 @@ class Leader(NodeState):
                         logging.info(f'{self} received heartbeat response from follower: None')
 
             logging.info('=====================================================')
+            
+            
+            ## Update Leader's commit index
+            ## if update, commit index points to the next position of the latest commited log
+            if not self.followers: # Edge case: If only Leader node itself exists, directly incremenet commit_index
+                self.commit_index = self.log.last_log_index + 1
+                logging.info(f'{self} alone commits, commit index: {self.commit_index}')
+
             N = self.commit_index + 1
             count = 0
             for id in self.match_index:
