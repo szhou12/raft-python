@@ -16,7 +16,7 @@ class Cluster:
     # uris = [f'localhost:500{i}' for i in ids] # TODO: change later
 
     def __init__(self, addrs):
-        self._nodes = [Node(id, f"{uri['ip']}:{uri['port']}") for id, uri in enumerate(addrs, start=0)]
+        self._nodes = [Node(id, f"http://{uri['ip']}:{uri['port']}") for id, uri in enumerate(addrs, start=0)]
         # self._nodes = [Node(id, uri) for id, uri in enumerate(self.uris, start=0)]
     
     def __len__(self):

@@ -1,7 +1,1 @@
-{
-    "addresses": [
-        {"ip": "http://127.0.0.1", "port": 8567},
-        {"ip": "http://127.0.0.1", "port": 9123},
-        {"ip": "http://127.0.0.1", "port": 8889}
-    ]
-}
+{"addresses": [{"ip": "127.0.0.1", "port": 61893, "internal_port": 61894}]}
