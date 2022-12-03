@@ -84,7 +84,7 @@ class Leader(NodeState):
             
             ## Update Leader's commit index
             ## if update, commit index points to the next position of the latest commited log
-            if not self.followers: # Edge case: If only Leader node itself exists, directly incremenet commit_index
+            if not self.followers: # Edge case: If only Leader node exists, directly incremenet commit_index
                 self.commit_index = self.log.last_log_index + 1
                 logging.info(f'{self} alone commits, commit index: {self.commit_index}')
 

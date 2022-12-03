@@ -68,7 +68,7 @@ class TimerThread(threading.Thread):
             self.become_follower()
         return vote_result
     
-    # TODO: invoked in app2.py
+
     # Leader rule 2: Leader responding to client
     def client_append_entries(self, client_request):
         '''
@@ -82,10 +82,14 @@ class TimerThread(threading.Thread):
         time.sleep(HEARTBEAT_INTERVAL)
         return result
     
+    # Leader rule 2: Leader responding to client
     def fetch_MQ(self):
         '''
         MQ saved in log, fetch the latest commited (commit_index - 1) MQ from Leader's log
         '''
+        # NOTE: postpone until entry applied to state machine
+        time.sleep(HEARTBEAT_INTERVAL)
+        
         result = self.node_state.fetch_MQ()
         return result
 

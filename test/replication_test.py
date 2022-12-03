@@ -60,6 +60,7 @@ def test_is_message_shared(swarm: Swarm, num_nodes: int):
 
     assert (leader1 != None)
     assert (leader1.create_topic(TEST_TOPIC).json() == {"success": True})
+    
     assert (leader1.put_message(TEST_TOPIC, TEST_MESSAGE).json()
             == {"success": True})
 

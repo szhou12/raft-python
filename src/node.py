@@ -68,31 +68,17 @@ def hello_raft():
 
 
 ###### Functions for communication between Server and Client
-# topics = {}
-
 @app.route('/topic', methods=['GET'])
 def get_all_topics():
     if not_leader():
         return jsonify({'success': False, 'topics': []})
     
-    # TODO NEED TO CHECK GET request string
-    # add to Leader's local log
-    # client_request = request.get_json()
-    # timer_thread.client_append_entries(client_request)
-
     topics = json.loads(timer_thread.fetch_MQ())
 
     topic_list = list(topics.keys())
-    # print(topic_list)
 
     statement = {'success': True, 'topics': topic_list}
     return jsonify(statement)
-    # if len(topic_list) > 0:
-    #     statement = {'success': True, 'topics': topic_list}
-    #     return jsonify(statement)
-    # else:
-    #     statement = {'success': False, 'topics': topic_list}
-    #     return jsonify(statement)
 
 
 @app.route('/topic', methods=['PUT'])
