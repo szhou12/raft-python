@@ -35,12 +35,8 @@ class Leader(NodeState):
         self.current_term = candidate.current_term
         self.vote_for = None # once node becomes Leader, reset vote_for=None
         self.save()
-        # self.commit_index = candidate.commit_index
-        # self.last_applied_index = candidate.last_applied_index
-        # self.entries = candidate.entries
         self.stopped = False
         self.followers = [peer for peer in self.cluster if peer != self.node]
-        # self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) # no use DELETE???
         self.next_index = {peer.id: self.log.last_log_index + 1 for peer in self.followers}
         self.match_index = {peer.id: 0 for peer in self.followers}
 
@@ -51,16 +47,6 @@ class Leader(NodeState):
             logging.info('====================================================>')
             client = Client()
             with client as session:
-                # posts = [
-                #     grequests.post(f'{peer.uri}/raft/heartbeat', json=self.node, session=session)
-                #     for peer in self.followers
-                # ]
-                # for response in grequests.map(posts, gtimeout=HEARTBEAT_INTERVAL): # stop waiting for response after heartbeat time
-                #     if response is not None:
-                #         logging.info(f'{self} received heartbeat response from follower: {response.json()}')
-                #     else:
-                #         logging.info(f'{self} received heartbeat response from follower: None')
-
                 posts = [
                     grequests.post(f'{peer.uri}/raft/heartbeat', json=AppenEntriesRequest(self, peer.id).to_json(), session=session)
                     for peer in self.followers
@@ -74,7 +60,7 @@ class Leader(NodeState):
                             self.next_index[result[2]] = self.log.last_log_index + 1
                         else:
                             self.next_index[result[2]] -= 1
-                            self.next_index[result[2]] = max(0, self.next_index[result[2]]) # ?????
+                            self.next_index[result[2]] = max(0, self.next_index[result[2]])
 
                     else:
                         logging.info(f'{self} received heartbeat response from follower: None')

@@ -96,12 +96,9 @@ class NodeState:
             logging.info(f'{self} rejects vote request as Candidate term: {candidate_term} < {self.current_term}')
             return VoteResult(False, self.current_term, self.id)
 
+        # RequestVote RPC Rule 2
         if self.vote_for is None or self.vote_for == candidate_id:
-            ## code without log replication
-            # self.vote_for = candidate_id
-            # return VoteResult(True, self.current_term, self.id)
-
-            # TODO: check if the candidate's log is newer than receiver's
+            # Check if the candidate's log is newer than receiver's
             if candidate_last_log_index >= self.log.last_log_index and candidate_last_log_term >= self.log.last_log_term:
                 logging.info(f'{self} accepts vote request as Candidate log is newer')
                 self.vote_for = candidate_id
@@ -147,7 +144,6 @@ class NodeState:
     
     def append_entries(self, append_entries_request):
         leader_term = append_entries_request['term']
-        # leader_id = append_entries_request['leader_id']
         leader_prev_log_index = append_entries_request['prev_log_index']
         leader_prev_log_term = append_entries_request['prev_log_term']
         leader_entries = append_entries_request['entries']
@@ -165,7 +161,6 @@ class NodeState:
         result = AppendEntriesResult(success=False, term=self.current_term, id=self.id)
         if not leader_entries:
             logging.info('heartbeat')
-            # result = AppendEntriesResult(True, self.current_term, self.id)
             result = result._replace(success=True)
         else:
             if leader_prev_log_term != self.log.get_log_term(leader_prev_log_index):

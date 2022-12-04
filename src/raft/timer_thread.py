@@ -27,8 +27,10 @@ class TimerThread(threading.Thread):
         self.become_follower()
     
     def become_follower(self):
-        # Follower becomes Candidate after timeout collapses
-        # randomizes timeout in case of >2 nodes timeout at the same time
+        '''
+        Follower becomes Candidate after timeout collapses.
+        andomizes timeout in case of >2 nodes timeout at the same time
+        '''
         timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * TIMEOUT_SCALER
         if type(self.node_state) != Follower:
             logging.info(f'{self} now becomes Follower...')
@@ -53,11 +55,11 @@ class TimerThread(threading.Thread):
         self.node_state = Leader(self.node_state)
         self.node_state.heartbeat()
     
-    # invoked in app2.py
+
     def vote(self, vote_request: VoteRequest):
         '''
         As Follower (node_state), vote for Candidate
-        Invoke NodeState.vote()
+        Invoked by node.py; Invoke NodeState.vote()
         '''
         logging.info(f'{self} received vote request: {vote_request}')
         vote_result = self.node_state.vote(vote_request)
@@ -69,9 +71,9 @@ class TimerThread(threading.Thread):
         return vote_result
     
 
-    # Leader rule 2: Leader responding to client
     def client_append_entries(self, client_request):
         '''
+        Leader rule 2: Leader responding to client
         Add client's PUT request to Leader's local log
         Arg:
             client_request: str
@@ -79,17 +81,21 @@ class TimerThread(threading.Thread):
         result = self.node_state.client_append_entries(client_request)
 
         # NOTE: postpone response to client until entry applied to state machine
-        time.sleep(HEARTBEAT_INTERVAL)
+        # In experiment, randomizing timeout appears to perform best (fewer failures)
+        timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * TIMEOUT_SCALER
+        time.sleep(timeout)
         return result
     
-    # Leader rule 2: Leader responding to client
     def fetch_MQ(self):
         '''
+        Leader rule 2: Leader responding to client
         MQ saved in log, fetch the latest commited (commit_index - 1) MQ from Leader's log
         '''
         # NOTE: postpone until entry applied to state machine
-        time.sleep(HEARTBEAT_INTERVAL)
-        
+        # In experiment, randomizing timeout appears to perform best (fewer failures)
+        timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * TIMEOUT_SCALER
+        time.sleep(timeout)
+
         result = self.node_state.fetch_MQ()
         return result
 
@@ -102,12 +108,6 @@ class TimerThread(threading.Thread):
         logging.info(f'{self} received append entries request: {append_entries_request}')
         append_result = self.node_state.append_entries(append_entries_request)
         logging.info(f'{self} returns append entries result: {append_result}')
-        
-        # if append_result[0]: # result['success']
-        #     self.node_state.current_term = append_result[1]
-        #     self.become_follower() # TODO: outside if ????
-        #     # set leader id
-        #     self.node_state.leader = append_entries_request['leader_id']
         
         self.node_state.current_term = append_result[1]
         self.become_follower() # Follower remains its role

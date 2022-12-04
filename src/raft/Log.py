@@ -17,7 +17,6 @@ class Log:
     
     @property
     def last_log_term(self):
-        # return self.log[self.get_last_log_index()].term if len(self.log) else -1
         return self.get_log_term(self.last_log_index)
     
     def get_log_term(self, log_index):

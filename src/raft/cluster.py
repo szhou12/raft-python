@@ -1,23 +1,16 @@
 import collections
 
 Node = collections.namedtuple('Node', ['id', 'uri'])
-# CLUSTER_SIZE = 5 # TODO: Change later # of nodes
-# ELECTION_TIMEOUT_MAX = 10 # unit: seconds
-# HEARTBEAT_INTERVAL = float(ELECTION_TIMEOUT_MAX/5)
 
-## TESTING
 # NOTE: HEARTBEAT_INTERVAL << min(ELECTION_TIMEOUT)
 TIMEOUT_SCALER = .001
 ELECTION_TIMEOUT_MAX = 300
-HEARTBEAT_INTERVAL = float(ELECTION_TIMEOUT_MAX/5) * TIMEOUT_SCALER
+HEARTBEAT_INTERVAL = float(ELECTION_TIMEOUT_MAX/4) * TIMEOUT_SCALER
 
 class Cluster:
-    # ids = range(0, CLUSTER_SIZE)
-    # uris = [f'localhost:500{i}' for i in ids] # TODO: change later
 
     def __init__(self, addrs):
         self._nodes = [Node(id, f"http://{uri['ip']}:{uri['port']}") for id, uri in enumerate(addrs, start=0)]
-        # self._nodes = [Node(id, uri) for id, uri in enumerate(self.uris, start=0)]
     
     def __len__(self):
         return len(self._nodes)

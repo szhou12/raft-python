@@ -100,27 +100,6 @@ def add_new_topic():
     timer_thread.client_append_entries(json.dumps(topics))
     return jsonify({'success': True})
 
-    # NOTE: old2
-    # client_request = request.get_json()
-    # new_topic = client_request['topic']
-
-    # if new_topic in topics:
-    #     return jsonify({'success': False})
-
-    # # add to Leader's local log
-    # timer_thread.client_append_entries(json.dumps(client_request))
-
-    # # wait until Leader commit confirmed, write to database
-    # topics[new_topic] = []
-    # return jsonify({'success': True})
-
-    # NOTE: old
-    # new_topic = request.json['topic']
-    # if new_topic in topics:
-    #     return jsonify({'success': False})
-    # topics[new_topic] = []
-    # return jsonify({'success': True})
-
 
 @app.route('/message', methods=['PUT'])
 def add_message():
@@ -140,29 +119,7 @@ def add_message():
     # add to Leader's local log
     timer_thread.client_append_entries(json.dumps(topics))
     return jsonify({'success': True})
-    
-    # NOTE: old2
-    # client_request = request.get_json()
-    # topic = client_request['topic']
 
-    # if topic not in topics:
-    #     return jsonify({'success': False})
-    
-    # # add to Leader's local log
-    # timer_thread.client_append_entries(json.dumps(client_request))
-
-    # # wait until Leader commit confirmed, write to database
-    # topics[topic].append(client_request['message'])
-    # return jsonify({'success': True})
-
-    # NOTE: old
-    # topic = request.json['topic']
-    # if topic not in topics:
-    #     return jsonify({'success': False})
-    
-    # message = request.json['message']
-    # topics[topic].append(message)
-    # return jsonify({'success': True})
 
 
 @app.route('/message/<topic>', methods=['GET'])
@@ -181,28 +138,6 @@ def get_message(topic):
     timer_thread.client_append_entries(json.dumps(topics))
     return jsonify({'success': True, 'message': message})
     
-    # NOTE: old2
-    # if topic not in topics or len(topics[topic]) == 0:
-    #     return jsonify({'success': False})
-
-    # # NOTE: 
-    # # This GET method consumes MQ, 
-    # # thus considered as WRITE operation and needed to be logged
-    # client_request = {"topic":topic, "op":"POP"}
-    # # add to Leader's local log
-    # timer_thread.client_append_entries(json.dumps(client_request))
-    # message = topics[topic][0]
-    # topics[topic] = topics[topic][1:]
-    # return jsonify({'success': True, 'message': message})
-
-
-    # NOTE: old
-    # if topic not in topics or len(topics[topic]) == 0:
-    #     return jsonify({'success': False, 'message': ''})
-    
-    # message = topics[topic][0]
-    # topics[topic] = topics[topic][1:]
-    # return jsonify({'success': True, 'message': message})
 
 
 @app.route('/status', methods=['GET'])
@@ -232,26 +167,18 @@ def not_leader():
     return role != 'Leader'
 
 ### python3 src/node.py config.json 0
-## app2.py -> node.py
+## node.py: Receives RPC from client
 if __name__ == '__main__':
     try:
         json_filename = sys.argv[1].strip()
         node_id = int(sys.argv[2].strip())
         addrs, cur_addr = load_conf(json_filename, node_id)
-        # NODE_ID = int(os.environ.get('NODE_ID'))
         cluster = Cluster(addrs)
         node = cluster[node_id]
 
-        # storage_path = './raft/data'
-        # if not os.path.exists(storage_path):
-        #     os.makedirs(storage_path)
-
         timer_thread = TimerThread(node_id, cluster)
-        # app = create_app()
         timer_thread.start()
         
-        # app.run(host=cur_addr['ip'].split("//")[1], port=cur_addr['port'], debug=True)
-        # app.run(host=cur_addr['ip'].split("//")[1], port=cur_addr['port'])
         app.run(host=cur_addr['ip'], port=cur_addr['port'])
     except KeyboardInterrupt:
         pass
