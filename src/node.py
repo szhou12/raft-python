@@ -12,18 +12,6 @@ from raft.timer_thread import TimerThread
 
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
-# NODE_ID = int(os.environ.get('NODE_ID'))
-# cluster = Cluster()
-# node = cluster[NODE_ID]
-# timer_thread = TimerThread(NODE_ID)
-
-# def create_app():
-#     raft = Flask(__name__)
-#     timer_thread.start()
-#     return raft
-
-# app = create_app()
-
 app = Flask(__name__)
 
 ###### Functions for communication among Server nodes
@@ -43,28 +31,10 @@ def heartbeat():
     When a node becomes Leader, it will POST heartbeat requests to other nodes
     Leader node -> heartbeat() -> Follower nodes
     '''
-    # leader = request.get_json()
-    # logging.info(f'{timer_thread} got heartbeat from Leader: {leader}')
-    # response = {"alive": True, "node": node}
-    # timer_thread.become_follower() # once receives heartbeat, this node maintains as Follower
-    # return jsonify(response)
-    
-    ## TODO: currently TESTing
     append_entries_request = request.get_json()
     result = timer_thread.append_entries(json.loads(append_entries_request))
     return jsonify(result)
 
-    
-
-
-# NOTE: TESTING PURPOSE (Delete later)
-@app.route('/')
-def hello_raft():
-    if not_leader():
-        return {"result":"Not Leader"}
-    else:
-        return {"result":"Is Leader!!!"}
-    # return f'raft cluster: {cluster}!'
 
 
 ###### Functions for communication between Server and Client
@@ -86,7 +56,6 @@ def add_new_topic():
     if not_leader():
         return jsonify({'success': False})
 
-    # TODO
     topics = json.loads(timer_thread.fetch_MQ())
 
     client_request = request.get_json()
