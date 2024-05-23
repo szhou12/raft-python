@@ -2,7 +2,6 @@
 # Contributions
 
 - Name: Shuyu Zhou
-- E-mail: szhou12@uchicago.edu
 
 # Responsibility
 
