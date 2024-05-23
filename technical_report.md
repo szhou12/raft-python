@@ -49,3 +49,6 @@ The experiments on log replication tests on 300ms level show that, on average, t
 - [The Raft Consensus Algorithm](https://raft.github.io/)
 - [Raft实现(2)：选举](https://www.jianshu.com/p/ccf9b8d3633d)
 - [Raft实现(3)：客户端指令和日志复制](https://www.jianshu.com/p/b9a760c7d64b)
+- [Journey to MIT 6.824 — Lab 2A Raft Leader Election](https://medium.com/codex/journey-to-mit-6-824-lab-2a-raft-leader-election-974087a55740)
+- [Students' Guide to Raft](https://thesquareplanet.com/blog/students-guide-to-raft/)
+- [MIT 6.824 Lab 2: Raft](http://nil.csail.mit.edu/6.824/2020/labs/lab-raft.html)
