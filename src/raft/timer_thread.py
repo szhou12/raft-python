@@ -11,10 +11,18 @@ from .Leader import Leader, AppenEntriesRequest
 logging.basicConfig(format='%(asctime)s-%(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 class TimerThread(threading.Thread):
-    def __init__(self, node_id, cluster):
+    def __init__(self, i, cluster):
+        '''
+        Args:
+            i: int. indicate i-th node in cluster
+            cluser: List[Node]. e.g. [0 -> http://127.0.0.1:8567, 1 -> http://127.0.0.1:9123, 2 -> http://127.0.0.1:8889]
+        Attrs:
+            self.cluster: List[Node]
+            self.node: i-th Node instance. e.g. 0-th Node: Node(id=0, uri='http://127.0.0.1:8567')
+        '''
         threading.Thread.__init__(self)
         self.cluster = cluster
-        self.node = cluster[node_id]
+        self.node = cluster[i]
         self.node_state = Follower(self.node, self.cluster)
         self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX)) * TIMEOUT_SCALER
         self.election_timer = threading.Timer(self.election_timeout, self.become_candidate)

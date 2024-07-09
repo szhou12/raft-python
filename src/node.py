@@ -135,15 +135,18 @@ def not_leader():
     role = type(timer_thread.node_state).__name__
     return role != 'Leader'
 
-### python3 src/node.py config.json 0
-## node.py: Receives RPC from client
+
+## node.py: Receives RPC from client.py
+### > python3 src/node.py config.json 0
 if __name__ == '__main__':
     try:
-        json_filename = sys.argv[1].strip()
-        node_id = int(sys.argv[2].strip())
+        json_filename = sys.argv[1].strip() # config.json
+        node_id = int(sys.argv[2].strip()) # 0
+
         addrs, cur_addr = load_conf(json_filename, node_id)
         cluster = Cluster(addrs)
-        node = cluster[node_id]
+
+        node = cluster[node_id] # this line is not used
 
         timer_thread = TimerThread(node_id, cluster)
         timer_thread.start()

@@ -21,12 +21,23 @@ class Cluster:
     def __repr__(self) -> str:
         return ", ".join([f'{node.id} -> {node.uri}' for node in self._nodes])
 
+## python3 src/raft/cluster.py
 if __name__ == '__main__':
     addrs = [
-        {"ip": "http://127.0.0.1", "port": 8567},
-        {"ip": "http://127.0.0.1", "port": 9123},
-        {"ip": "http://127.0.0.1", "port": 8889}
+        {"ip": "127.0.0.1", "port": 8567},
+        {"ip": "127.0.0.1", "port": 9123},
+        {"ip": "127.0.0.1", "port": 8889}
     ]
     cluster = Cluster(addrs)
-    print(cluster)
+    print(cluster) # 0 -> http://127.0.0.1:8567, 1 -> http://127.0.0.1:9123, 2 -> http://127.0.0.1:8889
+    print(cluster[0]) # get the 0-th node instance: Node(id=0, uri='http://127.0.0.1:8567')
+
+    # Two ways to get 0-th node's id: 0
+    print(cluster[0][0])
+    print(cluster[0].id)
+
+    # Two ways to get 0-th node's uri: http://127.0.0.1:8567
+    print(cluster[0][1])
+    print(cluster[0].uri)
+
     
