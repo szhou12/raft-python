@@ -100,9 +100,29 @@ Term is the node’s current term as an integer.
 
 ## Testing
 ### Manual Testing
+Need to invoke main functions in `src/node.py` and `src/client.py` respectively.
+
+Imagine `client.py` as user who sends requests and receives responses; `node.py` as server node who recieves requests, stores info, and returns responses.
+
+Suppose we want to inspect 3 server nodes running on ports 8567, 9123, 8889. We need to do the following 2 steps in order:
+1. Open 3 terminals and start 3 server nodes in each thread:
+```linux
+// start a thread for node 0 on port 8567:
+> python src/node.py config.json 0
+```
+2. Open 4th terminal and run client:
+```linux
+// client sends requests and receives responses from server node 0 on port 8567:
+> python src/client.py 8567
+```
 
 
 ### Using `pytest`
+1. Test on one specific test case `test_get_topic_empty()`:
 ```linux
 pytest test/message_queue_test.py::test_get_topic_empty
+```
+2. Test all test cases in `test/message_queue_test.py`:
+```linux
+pytest test/message_queue_test.py
 ```
