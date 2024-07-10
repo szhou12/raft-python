@@ -33,8 +33,7 @@ def get_topics(url, endpoint='topic'):
 
     res = response.json()
     if res['success']:
-        print('Topics Successfully Retrieved!')
-        print(res['topics'])
+        print('Topics Successfully Retrieved: ', res['topics'])
     else:
         print('Failed To Retrieve Topics')
 
@@ -67,8 +66,7 @@ def get_message(url, topic, endpoint='message'):
 
     res = response.json()
     if res['success']:
-        print('Message Successfully Retrieved!')
-        print(res['message'])
+        print('Message Successfully Retrieved: ', res['message'])
     else:
         print('Failed To Retrieve Message')
 
@@ -92,12 +90,25 @@ if __name__ == '__main__':
         url = f'http://{IP}:{port}'
 
         create_topic(url, topic="math")
+        print('-------------------')
+
         get_topics(url)
+        print('-------------------')
+
         add_message(url, topic="math", message='hello')
+        print('-------------------')
+
         add_message(url, topic="math", message='world')
+        print('-------------------')
+
         get_message(url, topic="math")
+        print('-------------------')
+
         get_message(url, topic="math")
+        print('-------------------')
+
         get_message(url, topic="math")
+        print('-------------------')
 
         ## TEST Election Algorithm
         get_status(url)

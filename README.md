@@ -6,17 +6,26 @@ pip install -r requirements.txt
 ```
 
 ## Virtual Environment
-Recommend creating a virtual environment to work on this project.
+Highly recommend creating a virtual environment to work on this project.
 
 For example:
 ```
-conda create --name <env-name> python=3.9 
+conda create --name network python=3.9 
 ```
+
+**NOTE**: If you are using a conda environment, it's better to check which Python interpreter the conda environment is referring to.
+1. Check the Python Interpreter:
+```linux
+which python
+```
+It's likely to output: `/opt/anaconda3/envs/network/bin/python`
+
+This means the current conda env is referring to `python`. Thus, whenever you need to run Python scripts in the terminal, you should use `> python` instead of `> python3`.
 
 ## Implementation and API Specifications
 ### Starting the Server
 ```linux
-> python3 src/node.py <path_to_config> index
+> python src/node.py <path_to_config> index
 ```
 * `<path_to_config>`: the path to a JSON file with a list of the IP and port of all the nodes in the RRMQ (relative to the root folder of the repository).
 * `index`: the index of the current server in that JSON list of addresses that will be used to let the server know its own IP and port.
@@ -24,7 +33,7 @@ conda create --name <env-name> python=3.9
 For example, a system with 3 local nodes on ports 8567, 9123, 8889 would have the following `config.json` file:
 ```json
 {
-    addresses: 
+    "addresses": 
     [
         {"ip": "127.0.0.1", "port": 8567},
         {"ip": "127.0.0.1", "port": 9123},
@@ -34,9 +43,9 @@ For example, a system with 3 local nodes on ports 8567, 9123, 8889 would have th
 ```
 And we would start this system with the following commands in 3 separate terminals:
 ```linux
-> python3 src/node.py config.json 0 # will be on http://127.0.0.1:8567
-> python3 src/node.py config.json 1 # will be on http://127.0.0.1:9123
-> python3 src/node.py config.json 2 # will be on http://127.0.0.1:8889
+> python src/node.py config.json 0 # will be on http://127.0.0.1:8567
+> python src/node.py config.json 1 # will be on http://127.0.0.1:9123
+> python src/node.py config.json 2 # will be on http://127.0.0.1:8889
 ```
 
 ### REST API
@@ -90,4 +99,10 @@ Role may be one of three options: Leader, Candidate, Follower.
 Term is the node’s current term as an integer.
 
 ## Testing
-Using `pytest`
+### Manual Testing
+
+
+### Using `pytest`
+```linux
+pytest test/message_queue_test.py::test_get_topic_empty
+```

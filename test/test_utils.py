@@ -28,7 +28,10 @@ class Node:
         self.config_path = config_path
 
     def start(self):
-        self.startup_sequence = ["python3",
+        # NOTE: change "python3" to "python" 
+        # bc we are working on this project in a Conda env "network" which configures python as Python Interpreter. 
+        # python3 might point to a system-wide Python installation instead of the one within the Conda env.
+        self.startup_sequence = ["python",
                                  self.program_file_path,
                                  self.config_path,
                                  str(self.i)]
