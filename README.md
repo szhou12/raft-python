@@ -5,6 +5,14 @@
 pip install -r requirements.txt
 ```
 
+## Virtual Environment
+Recommend creating a virtual environment to work on this project.
+
+For example:
+```
+conda create --name <env-name> python=3.9 
+```
+
 ## Implementation and API Specifications
 ### Starting the Server
 ```linux

@@ -1,1 +1,4 @@
-pip install grequests
+grequests
+requests
+flask
+gevent
