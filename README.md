@@ -1,5 +1,18 @@
 # Raft REST Message Queue (RRMQ)
 
+## Table of Contents
+* [Dependencies](#dependencies)
+* [Virtual Environment](#virtual-environment)
+* [Implementation and API Specifications](#implementation-and-api-specifications)
+  * [Starting the Server](#starting-the-server)
+  * [REST API](#rest-api)
+    * [Topic](#topic)
+    * [Message](#message)
+    * [Status](#status)
+* [Testing](#testing)
+    * [Manual Testing](#manual-testing)
+    * [Using `pytest`](#using-pytest)
+
 ## Dependencies
 ```
 pip install -r requirements.txt

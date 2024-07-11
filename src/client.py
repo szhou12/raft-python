@@ -22,7 +22,7 @@ def create_topic(url, topic, endpoint='topic'):
     if res['success']:
         print('New Topic Successfully Created!')
     else:
-        print('Failed To Create New Topic')
+        print('Failed To Create New Topic!')
 
 def get_topics(url, endpoint='topic'):
     response = requests.get(f'{url}/{endpoint}') 
@@ -35,7 +35,7 @@ def get_topics(url, endpoint='topic'):
     if res['success']:
         print('Topics Successfully Retrieved: ', res['topics'])
     else:
-        print('Failed To Retrieve Topics')
+        print('Failed To Retrieve Topics!')
 
 
 def add_message(url, topic, message, endpoint='message'):
@@ -55,7 +55,7 @@ def add_message(url, topic, message, endpoint='message'):
     if res['success']:
         print('New Message Successfully Added!')
     else:
-        print('Failed To Add New Message')
+        print('Failed To Add New Message!')
 
 def get_message(url, topic, endpoint='message'):
     response = requests.get(f'{url}/{endpoint}/{topic}')
@@ -68,7 +68,7 @@ def get_message(url, topic, endpoint='message'):
     if res['success']:
         print('Message Successfully Retrieved: ', res['message'])
     else:
-        print('Failed To Retrieve Message')
+        print('Failed To Retrieve Message!')
 
 
 def get_status(url, endpoint='status'):
