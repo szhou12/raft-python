@@ -139,3 +139,7 @@ pytest test/message_queue_test.py::test_get_topic_empty
 ```linux
 pytest test/message_queue_test.py
 ```
+3. Test all test cases in `test/election_test.py`:
+```linux
+pytest test/election_test.py
+```
