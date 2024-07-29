@@ -143,3 +143,14 @@ pytest test/message_queue_test.py
 ```linux
 pytest test/election_test.py
 ```
+4. Test all test cases in `test/replication_test.py`:
+```linux
+pytest test/replication_test.py
+```
+
+### Repeat Testing
+If you want to repeatedly execute the `pytest` for a specified number of times (in order to test the performance on specific parameters values: number of nodes, timeout, etc.), you can execute the following Bash command:
+```linux
+./run_tests.sh 10 test/election_test.py
+```
+This script will run pytest test/election_test.py 10 times.

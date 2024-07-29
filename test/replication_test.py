@@ -5,12 +5,12 @@ import requests
 import os
 import glob
 
-NUM_NODES_ARRAY = [5]
 PROGRAM_FILE_PATH = "src/node.py"
 TEST_TOPIC = "test_topic"
 TEST_MESSAGE = "Test Message"
 
-ELECTION_TIMEOUT = 0.3
+NUM_NODES_ARRAY = [11]
+ELECTION_TIMEOUT = .3 # 0.3=300ms
 NUMBER_OF_LOOP_FOR_SEARCHING_LEADER = 3
 
 

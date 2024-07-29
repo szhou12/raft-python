@@ -8,11 +8,11 @@ import glob
 # seconds the program will wait after starting a node for election to happen
 # it is set conservatively, you will likely be able to lower it for faster testing
 # ELECTION_TIMEOUT = 2.0
-ELECTION_TIMEOUT = 0.3 # 300ms
+ELECTION_TIMEOUT = 1 # 0.3=300ms
 
 # array of numbr of nodes spawned on tests, an example could be [3,5,7,11,...]
 # default is only 5 for faster tests
-NUM_NODES_ARRAY = [5]
+NUM_NODES_ARRAY = [11]
 
 
 # yoour `node.py` file path
